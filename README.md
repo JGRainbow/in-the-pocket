@@ -6,7 +6,7 @@ An Application for measuring the swing feel / rhythmic accuracy of two files:
 - Audio (recorded sample / live audio)
 
 # System Requirements
-The I/O is built on top of PyAudio. To install this on your device, refer to (these)[https://pypi.org/project/PyAudio/] docs. 
+The I/O is built on top of PyAudio. To install this on your device, refer to [these docs](https://pypi.org/project/PyAudio/).
 
 # Output Requirements
 

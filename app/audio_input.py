@@ -11,6 +11,6 @@ class AbstractAudioInput(ABC):
 
 
 class ComputerAudioInput(AbstractAudioInput):
+    pass
 
-    
 
