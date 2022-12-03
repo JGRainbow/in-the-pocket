@@ -33,7 +33,8 @@ def input_callback(indata, frames, time, status):
 
 
 def process_batch(data: np.ndarray):
-    print(f'{len(data)} samples created; max value: {data.max()}')
+    if data is not None:
+        print(f'{len(data)} samples created; max value: {data.max()}')
     return data
 
 
