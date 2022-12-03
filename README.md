@@ -6,7 +6,9 @@ An Application for measuring the swing feel / rhythmic accuracy of two files:
 - Audio (recorded sample / live audio)
 
 # System Requirements
-The I/O is built on top of PyAudio. To install this on your device, refer to [these docs](https://pypi.org/project/PyAudio/).
+The I/O is built on top of SoundDevice. To install this on your device, refer to [these docs](https://python-sounddevice.readthedocs.io/en/0.4.5/installation.html).
+
+After that, simply run `poetry install` from the root directory. 
 
 # Output Requirements
 
@@ -30,3 +32,6 @@ The I/O is built on top of PyAudio. To install this on your device, refer to [th
 - `NoteFilter`
 - `QuantisationMetric`
 - `ReportCreator`
+
+# Troubleshooting
+Refer [here](https://stackoverflow.com/questions/33513522/when-installing-pyaudio-pip-cannot-find-portaudio-h-in-usr-local-include) for any issues installing portaudio.
