@@ -1,5 +1,6 @@
 import argparse
 import queue
+from datetime import datetime
 from queue import Queue
 import sys
 import time
@@ -17,8 +18,9 @@ audio_queue = queue.Queue()
 DEVICE = None
 CHANNELS = [1]
 SAMPLERATE = get_device_sample_rate()
-DOWNSAMPLE = 5
+DOWNSAMPLE = 20
 WINDOW = 200 # Visible time slot in ms
+BATCH_INTERVAL = 1 # In seconds
 mapping = [c - 1 for c in CHANNELS]
 
 
@@ -31,10 +33,13 @@ def input_callback(indata, frames, time, status):
 
 
 def process_batch(data: np.ndarray):
+    print(f'{len(data)} samples created; max value: {data.max()}')
     return data
 
 
-def create_batch(audio_queue: Queue):
+def create_batch(audio_queue: Queue, duration_seconds: float):
+    print(f"Creating {duration_seconds}-second batch from {datetime.utcnow()}")
+    time.sleep(duration_seconds)
     while True:
         try:
             data = audio_queue.get_nowait()
@@ -49,14 +54,10 @@ try:
         samplerate=SAMPLERATE, callback=input_callback)
 
     with stream:
-        seconds = 0
         while True:
-            print(f'Streaming second: {seconds}')
-            time.sleep(1)
-            seconds += 1
-            data = create_batch(audio_queue)
+            data = create_batch(audio_queue, duration_seconds=BATCH_INTERVAL)
             processed_data = process_batch(data)
-            print(f'{len(processed_data)} samples created; max value: {processed_data.max()}')
+            print(audio_queue.qsize())
 
 
 except Exception as e:
