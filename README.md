@@ -5,6 +5,9 @@ An Application for measuring the swing feel / rhythmic accuracy of two files:
 - Master (pre-defined beat pattern / metronome)
 - Audio (recorded sample / live audio)
 
+# System Requirements
+The I/O is built on top of PyAudio. To install this on your device, refer to (these)[https://pypi.org/project/PyAudio/] docs. 
+
 # Output Requirements
 
 - Live information — ‘you’re rushing!’
