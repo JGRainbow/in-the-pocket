@@ -1,6 +1,7 @@
 import argparse
 import queue
 import sys
+import time
 
 from matplotlib.animation import FuncAnimation
 import matplotlib.pyplot as plt
@@ -54,7 +55,7 @@ mapping = [c - 1 for c in args.channels]  # Channel numbers start with 1
 q = queue.Queue()
 
 
-def audio_callback(indata, frames, time, status):
+def input_callback(indata, frames, time, status):
     """This is called (from a separate thread) for each audio block."""
     if status:
         print(status, file=sys.stderr)
@@ -62,7 +63,7 @@ def audio_callback(indata, frames, time, status):
     q.put(indata[::args.downsample, mapping])
 
 
-def update_plot(frame):
+def update_plot():
     """This is called by matplotlib for each plot update.
 
     Typically, audio callbacks happen more frequently than plot updates,
@@ -76,12 +77,6 @@ def update_plot(frame):
             print(data)
         except queue.Empty:
             break
-        shift = len(data)
-        plotdata = np.roll(plotdata, -shift, axis=0)
-        plotdata[-shift:, :] = data
-    for column, line in enumerate(lines):
-        line.set_ydata(plotdata[:, column])
-    return lines
 
 
 try:
@@ -89,29 +84,22 @@ try:
         device_info = sd.query_devices(args.device, 'input')
         args.samplerate = device_info['default_samplerate']
 
-    length = int(args.window * args.samplerate / (1000 * args.downsample))
-    plotdata = np.zeros((length, len(args.channels)))
-
-    fig, ax = plt.subplots()
-    lines = ax.plot(plotdata)
-    if len(args.channels) > 1:
-        ax.legend([f'channel {c}' for c in args.channels],
-                  loc='lower left', ncol=len(args.channels))
-    ax.axis((0, len(plotdata), -1, 1))
-    ax.set_yticks([0])
-    ax.yaxis.grid(True)
-    ax.tick_params(bottom=False, top=False, labelbottom=False,
-                   right=False, left=False, labelleft=False)
-    fig.tight_layout(pad=0)
-
-    # print(f'Device: {args.device} \n Channels: {args.channels} \n samplerate: {args.samplerate}')
-
     stream = sd.InputStream(
         device=args.device, channels=max(args.channels),
-        samplerate=args.samplerate, callback=audio_callback)
-    ani = FuncAnimation(fig, update_plot, interval=args.interval, blit=True)
+        samplerate=args.samplerate, callback=input_callback)
+
     with stream:
-        plt.show()
+        seconds = 0
+        while True:
+            print(f'Streaming second: {seconds}')
+            time.sleep(1)
+            try:
+                data = q.get_nowait()
+                print(data)
+                seconds += 1
+            except queue.Empty:
+                break
+    
 except Exception as e:
     parser.exit(type(e).__name__ + ': ' + str(e))
     
